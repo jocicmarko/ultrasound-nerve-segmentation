@@ -1,0 +1,1 @@
+Raw images (from Kaggle) should be put here.
