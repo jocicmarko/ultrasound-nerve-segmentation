@@ -14,9 +14,9 @@ The architecture was inspired by [U-Net: Convolutional Networks for Biomedical I
 ## Update 02.04.2017.
 
 Changes:
-- use Keras 2
+- using Keras 2
 - using TF backend instead of Theano
-- use scikit-image instead of cv2
+- using scikit-image instead of cv2
 - added code for saving predicted images to disk  
 
 ---
