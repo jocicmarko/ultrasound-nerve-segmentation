@@ -17,7 +17,8 @@ Changes:
 - using Keras 2
 - using TF backend instead of Theano
 - using scikit-image instead of cv2
-- added code for saving predicted images to disk  
+- added code for saving predicted images to disk 
+- training data is now split into train/validation data (80%/20%)
 
 ---
 
