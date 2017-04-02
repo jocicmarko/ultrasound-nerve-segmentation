@@ -3,7 +3,7 @@ from __future__ import print_function
 import os
 import numpy as np
 
-import cv2
+from skimage.io import imsave, imread
 
 data_path = 'raw/'
 
@@ -16,8 +16,8 @@ def create_train_data():
     images = os.listdir(train_data_path)
     total = len(images) / 2
 
-    imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
-    imgs_mask = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
+    imgs = np.ndarray((total, image_rows, image_cols), dtype=np.uint8)
+    imgs_mask = np.ndarray((total, image_rows, image_cols), dtype=np.uint8)
 
     i = 0
     print('-'*30)
@@ -27,8 +27,8 @@ def create_train_data():
         if 'mask' in image_name:
             continue
         image_mask_name = image_name.split('.')[0] + '_mask.tif'
-        img = cv2.imread(os.path.join(train_data_path, image_name), cv2.IMREAD_GRAYSCALE)
-        img_mask = cv2.imread(os.path.join(train_data_path, image_mask_name), cv2.IMREAD_GRAYSCALE)
+        img = imread(os.path.join(train_data_path, image_name), as_grey=True)
+        img_mask = imread(os.path.join(train_data_path, image_mask_name), as_grey=True)
 
         img = np.array([img])
         img_mask = np.array([img_mask])
@@ -57,7 +57,7 @@ def create_test_data():
     images = os.listdir(train_data_path)
     total = len(images)
 
-    imgs = np.ndarray((total, 1, image_rows, image_cols), dtype=np.uint8)
+    imgs = np.ndarray((total, image_rows, image_cols), dtype=np.uint8)
     imgs_id = np.ndarray((total, ), dtype=np.int32)
 
     i = 0
@@ -66,7 +66,7 @@ def create_test_data():
     print('-'*30)
     for image_name in images:
         img_id = int(image_name.split('.')[0])
-        img = cv2.imread(os.path.join(train_data_path, image_name), cv2.IMREAD_GRAYSCALE)
+        img = imread(os.path.join(train_data_path, image_name), as_grey=True)
 
         img = np.array([img])
 

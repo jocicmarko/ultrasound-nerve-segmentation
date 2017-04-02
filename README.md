@@ -8,6 +8,17 @@ and can be a good staring point for further, more serious approaches.
 
 The architecture was inspired by [U-Net: Convolutional Networks for Biomedical Image Segmentation](http://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/).
 
+
+---
+
+## Update 02.04.2017.
+
+Changes:
+- use Keras 2
+- using TF backend instead of Theano
+- use scikit-image instead of cv2
+- added code for saving predicted images to disk  
+
 ---
 
 ## Overview
@@ -57,9 +68,9 @@ The weights are updated by Adam optimizer, with a 1e-5 learning rate. During tra
 
 This tutorial depends on the following libraries:
 
-* cv2 (OpenCV)
-* Theano and/or Tensorflow
-* Keras >= 1.0
+* scikit-image
+* Tensorflow
+* Keras >= 2.0
 
 Also, this code should be compatible with Python versions 2.7-3.5.
 

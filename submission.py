@@ -1,14 +1,14 @@
 from __future__ import print_function
 
 import numpy as np
-import cv2
+from skimage.transform import resize
 from data import image_cols, image_rows
 
 
 def prep(img):
     img = img.astype('float32')
-    img = cv2.threshold(img, 0.5, 1., cv2.THRESH_BINARY)[1].astype(np.uint8)
-    img = cv2.resize(img, (image_cols, image_rows))
+    img = (img > 0.5).astype(np.uint8)  # threshold
+    img = resize(img, (image_cols, image_rows), preserve_range=True)
     return img
 
 
