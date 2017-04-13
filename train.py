@@ -147,7 +147,7 @@ def train_and_predict():
         os.mkdir(pred_dir)
     for image, image_id in zip(imgs_mask_test, imgs_id_test):
         image = (image[:, :, 0] * 255.).astype(np.uint8)
-        imsave(os.path.join(pred_dir, image_id + '_pred.png'), image)
+        imsave(os.path.join(pred_dir, str(image_id) + '_pred.png'), image)
 
 if __name__ == '__main__':
     train_and_predict()
