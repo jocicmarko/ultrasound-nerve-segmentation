@@ -109,7 +109,7 @@ def train_and_predict():
     print('Creating and compiling model...')
     print('-'*30)
     model = get_unet()
-    model_checkpoint = ModelCheckpoint('weights.h5', monitor='loss', save_best_only=True)
+    model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
 
     print('-'*30)
     print('Fitting model...')
