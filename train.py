@@ -5,7 +5,7 @@ from skimage.transform import resize
 from skimage.io import imsave
 import numpy as np
 from keras.models import Model
-from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, UpSampling2D
+from keras.layers import Input, concatenate, Conv2D, MaxPooling2D, Conv2DTranspose
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from keras import backend as K
@@ -52,19 +52,19 @@ def get_unet():
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool4)
     conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(conv5)
 
-    up6 = concatenate([UpSampling2D(size=(2, 2))(conv5), conv4], axis=3)
+    up6 = concatenate([Conv2DTranspose(256, (2, 2), strides=(2, 2), padding='same')(conv5), conv4], axis=3)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
     conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
 
-    up7 = concatenate([UpSampling2D(size=(2, 2))(conv6), conv3], axis=3)
+    up7 = concatenate([Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same')(conv6), conv3], axis=3)
     conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(up7)
     conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv7)
 
-    up8 = concatenate([UpSampling2D(size=(2, 2))(conv7), conv2], axis=3)
+    up8 = concatenate([Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(conv7), conv2], axis=3)
     conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(up8)
     conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv8)
 
-    up9 = concatenate([UpSampling2D(size=(2, 2))(conv8), conv1], axis=3)
+    up9 = concatenate([Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conv8), conv1], axis=3)
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
     conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
 
