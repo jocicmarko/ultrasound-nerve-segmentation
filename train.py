@@ -12,13 +12,12 @@ from keras import backend as K
 
 from data import load_train_data, load_test_data
 
-K.set_image_data_format('channels_last')  # TF dimension ordering in this code
+K.set_image_data_format('channels_last') # Tensorflow dimension ordering in this code
 
 img_rows = 96
 img_cols = 96
 
 smooth = 1.
-
 
 def dice_coef(y_true, y_pred):
     y_true_f = K.flatten(y_true)
@@ -26,53 +25,56 @@ def dice_coef(y_true, y_pred):
     intersection = K.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
-
 def dice_coef_loss(y_true, y_pred):
     return -dice_coef(y_true, y_pred)
 
+def conv3x3(kernel_size,input):
+    return Conv2D(kernel_size,(3,3),activation='relu',padding='same')(input)
+
+def concatenate2x2(kernel_size,first,second):
+    return concatenate([Conv2DTranspose(kernel_size, (2, 2), strides=[2, 2], padding='same')(first), second], axis=3)
 
 def get_unet():
-    inputs = Input((img_rows, img_cols, 1))
-    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(inputs)
-    conv1 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv1)
-    pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+    inputs = Input((img_rows,img_cols,1))
+    conv1 = conv3x3(32,inputs)
+    conv1 = conv3x3(32,conv1)
+    pool1 = MaxPooling2D(pool_size=(2,2))(conv1)
 
-    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(pool1)
-    conv2 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv2)
-    pool2 = MaxPooling2D(pool_size=(2, 2))(conv2)
+    conv2 = conv3x3(64,pool1)
+    conv2 = conv3x3(64,conv2)
+    pool2 = MaxPooling2D(pool_size=(2,2))(conv2)
 
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(pool2)
-    conv3 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv3)
-    pool3 = MaxPooling2D(pool_size=(2, 2))(conv3)
+    conv3 = conv3x3(128,pool2)
+    conv3 = conv3x3(128,conv3)
+    pool3 = MaxPooling2D(pool_size=(2,2))(conv3)
 
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(pool3)
-    conv4 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv4)
-    pool4 = MaxPooling2D(pool_size=(2, 2))(conv4)
+    conv4 = conv3x3(256,pool3)
+    conv4 = conv3x3(256,conv4)
+    pool4 = MaxPooling2D(pool_size=(2,2))(conv4)
 
-    conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(pool4)
-    conv5 = Conv2D(512, (3, 3), activation='relu', padding='same')(conv5)
+    conv5 = conv3x3(512,pool4)
+    conv5 = conv3x3(512,conv5)
 
-    up6 = concatenate([Conv2DTranspose(256, (2, 2), strides=(2, 2), padding='same')(conv5), conv4], axis=3)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(up6)
-    conv6 = Conv2D(256, (3, 3), activation='relu', padding='same')(conv6)
+    up6 = concatenate2x2(256,conv5,conv4)
+    conv6 = conv3x3(256,up6)
+    conv6 = conv3x3(256,conv6)
 
-    up7 = concatenate([Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same')(conv6), conv3], axis=3)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(up7)
-    conv7 = Conv2D(128, (3, 3), activation='relu', padding='same')(conv7)
+    up7 = concatenate2x2(128,conv6,conv3)
+    conv7 = conv3x3(128,up7)
+    conv7 = conv3x3(128,conv7)
 
-    up8 = concatenate([Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same')(conv7), conv2], axis=3)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(up8)
-    conv8 = Conv2D(64, (3, 3), activation='relu', padding='same')(conv8)
+    up8 = concatenate2x2(64,conv7,conv2)
+    conv8 = conv3x3(64,up8)
+    conv8 = conv3x3(64,conv8)
 
-    up9 = concatenate([Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same')(conv8), conv1], axis=3)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(up9)
-    conv9 = Conv2D(32, (3, 3), activation='relu', padding='same')(conv9)
+    up9 = concatenate2x2(32,conv8,conv1)
+    conv9 = conv3x3(32,up9)
+    conv9 = conv3x3(32,conv9)
 
-    conv10 = Conv2D(1, (1, 1), activation='sigmoid')(conv9)
+    conv10= Conv2D(1,(1,1),activation='sigmoid')(conv9)
+    model = Model(inputs= [inputs],outputs=[conv10])
 
-    model = Model(inputs=[inputs], outputs=[conv10])
-
-    model.compile(optimizer=Adam(lr=1e-5), loss=dice_coef_loss, metrics=[dice_coef])
+    model.compile(optimizer=Adam(lr=1e-5),loss=dice_coef,metrics=[dice_coef])
 
     return model
 
@@ -114,7 +116,7 @@ def train_and_predict():
     print('-'*30)
     print('Fitting model...')
     print('-'*30)
-    model.fit(imgs_train, imgs_mask_train, batch_size=32, nb_epoch=20, verbose=1, shuffle=True,
+    model.fit(imgs_train, imgs_mask_train, batch_size=32, epochs=20, verbose=1, shuffle=True,
               validation_split=0.2,
               callbacks=[model_checkpoint])
 
