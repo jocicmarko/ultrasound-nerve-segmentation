@@ -31,7 +31,7 @@ This script just loads the images and saves them into NumPy binary format files 
 
 ### Pre-processing
 
-The images are not pre-processed in any way, except resizing to 64 x 80. Since the images are pretty noisy,
+The images are not pre-processed in any way, except resizing to 96 x 96. Since the images are pretty noisy,
 I expect that some thoughtful pre-processing could yield better performance of the model.
 
 Output images (masks) are scaled to \[0, 1\] interval.
@@ -45,7 +45,7 @@ See picture below (note that image size and numbers of convolutional filters in 
 
 This deep neural network is implemented with Keras functional API, which makes it extremely easy to experiment with different interesting architectures.
 
-Output from the network is a 64 x 80 which represents mask that should be learned. Sigmoid activation function
+Output from the network is a 96 x 96 which represents mask that should be learned. Sigmoid activation function
 makes sure that mask pixels are in \[0, 1\] range.
 
 ### Training
